@@ -19,6 +19,19 @@
           }
         ];
       };
+			jinx = nixpkgs.lib.nixosSystem {
+				system = "x86_64-linux";
+				modules = [
+				  ./hosts/jinx/configuration.nix
+					home-manager.nixosModules.home-manager
+					{
+				    home-manager.useGlobalPkgs = true;
+						home-manager.useUserPackages = true;
+						home-manager.users.sasan = import ./home/sasan/home.nix;
+					}
+				];
+      };
+			
     };
   };
 }
