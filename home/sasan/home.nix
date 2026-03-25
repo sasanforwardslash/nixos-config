@@ -2,12 +2,64 @@
 {
   home.username = "sasan";
   home.homeDirectory = "/home/sasan";
-
-  # Home Manager release - don't change unless HM says to
   home.stateVersion = "24.11";
 
-  home.packages = [];
-
   programs.home-manager.enable = true;
+
+  # --- Packages ---
+  home.packages = with pkgs; [
+    ripgrep
+    fzf
+    fd
+    bat
+    eza
+    htop
+  ];
+
+  # --- Git ---
+  programs.git = {
+    enable = true;
+		signing.format = null;
+    settings = {
+      user.name = "sasanforwardslash";
+      user.email = "17885066+sasanforwardslash@users.noreply.github.com";
+      init.defaultBranch = "main";
+      push.autoSetupRemote = true;
+    };
+  };
+
+  # --- Zsh ---
+  programs.zsh = {
+    enable = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+    history = {
+      size = 10000;
+      ignoreDups = true;
+    };
+    shellAliases = {
+      ls = "eza";
+      ll = "eza -la";
+      cat = "bat";
+      grep = "ripgrep";
+      rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#silco";
+    };
+  };
+
+  # --- NeoVim ---
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    extraConfig = ''
+      set number
+      set relativenumber
+      set tabstop=2
+      set shiftwidth = 2
+      set expandtab
+      set clipboard=unnamedplus
+    '';
+  };
 }
 
