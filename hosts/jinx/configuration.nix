@@ -46,7 +46,7 @@
     isNormalUser = true;
     description = "sasan";
     extraGroups = [ "networkmanager" "wheel" ];
-		shell = pkgs.zsh
+		shell = pkgs.zsh;
   };
 
   programs.firefox.enable = true;
