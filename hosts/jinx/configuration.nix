@@ -46,12 +46,15 @@
     isNormalUser = true;
     description = "sasan";
     extraGroups = [ "networkmanager" "wheel" ];
+		shell = pkgs.zsh
   };
 
   programs.firefox.enable = true;
   nixpkgs.config.allowUnfree = true;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  programs.zsh.enable = true;
 
   environment.systemPackages = with pkgs; [
     gparted
