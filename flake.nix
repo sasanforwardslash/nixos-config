@@ -10,6 +10,7 @@
       silco = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
+          ./modules/common.nix
           ./hosts/silco/configuration.nix
           home-manager.nixosModules.home-manager
           {
@@ -19,17 +20,19 @@
           }
         ];
       };
-			jinx = nixpkgs.lib.nixosSystem {
-				system = "x86_64-linux";
-				modules = [
-				  ./hosts/jinx/configuration.nix
-					home-manager.nixosModules.home-manager
-					{
-				    home-manager.useGlobalPkgs = true;
-						home-manager.useUserPackages = true;
-						home-manager.users.sasan = import ./home/sasan/home.nix;
-					}
-				];
+
+      jinx = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+	modules = [
+          ./modules/common.nix
+	  ./hosts/jinx/configuration.nix
+          home-manager.nixosModules.home-manager
+ 	  {
+            home-manager.useGlobalPkgs = true;
+	    home-manager.useUserPackages = true;
+	    home-manager.users.sasan = import ./home/sasan/home.nix;
+	  }
+	];
       };
 			
     };
