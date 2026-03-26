@@ -9,6 +9,20 @@
 
   networking.hostName = "silco";
 
+  # Virtualization
+  virtualisation.docker.enable = true;
+	virtualisation.oci-containers = {
+    backend = "docker";
+
+		containers = {
+      hello = {
+        image = "nginx:alpine";
+				ports = [ "8080:80" ];
+				autoStart = true;
+			};
+    };
+	};
+
   # Desktop
   services.xserver.enable = true;
   services.xserver.displayManager.lightdm.enable = true;

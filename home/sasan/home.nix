@@ -14,6 +14,9 @@
     bat
     eza
     htop
+    age
+    ssh-to-age
+    sops
   ];
 
   # --- Git ---
