@@ -1,0 +1,10 @@
+keys:
+  - &silco age1ncq9un2ud29lyygmvtyg9744udpljl099uw3t4t9tr5zt9zkxvgs8llu5q
+  - &sasan age1rzge8az6z54ysq90s8l4ekppe2qr4j0yqqjatfngv5m3yy28nv0syzld9z
+
+creation_rules:
+  - path_regex: hosts/silco/secrets/.*\.yaml$
+    key_groups:
+      - age:
+        - *silco
+        - *sasan

@@ -1,6 +1,8 @@
 { config, pkgs, ... }:
 {
-  imports = [ ./hardware-configuration.nix ];
+  imports = [ ./hardware-configuration.nix
+              ./sops.nix          
+  ];
 
   # Bootloader
   boot.loader.grub.enable = true;
