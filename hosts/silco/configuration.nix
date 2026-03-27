@@ -1,29 +1,19 @@
 { config, pkgs, ... }:
 {
-  imports = [ ./hardware-configuration.nix
-              ./sops.nix          
+  imports = [
+    ./hardware-configuration.nix
+    ./sops.nix
+    ./containers.nix
   ];
 
   # Bootloader
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
-
   networking.hostName = "silco";
 
   # Virtualization
   virtualisation.docker.enable = true;
-	virtualisation.oci-containers = {
-    backend = "docker";
-
-		containers = {
-      hello = {
-        image = "nginx:alpine";
-				ports = [ "8080:80" ];
-				autoStart = true;
-			};
-    };
-	};
 
   # Desktop
   services.xserver.enable = true;
@@ -33,9 +23,7 @@
     layout = "us";
     variant = "";
   };
-
   services.printing.enable = true;
-
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -43,7 +31,6 @@
     alsa.support32Bit = true;
     pulse.enable = true;
   };
-
   programs.firefox.enable = true;
 
   # Remote access
