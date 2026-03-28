@@ -44,7 +44,7 @@
       ls = "eza";
       ll = "eza -la";
       cat = "bat";
-      grep = "ripgrep";
+      grep = "rg";
       rebuild = "sudo nixos-rebuild switch --flake ~/nixos-config#silco";
     };
   };
@@ -63,6 +63,9 @@
       set expandtab
       set clipboard=unnamedplus
     '';
+    plugins = with pkgs.vimPlugins; [
+      editorconfig-nvim
+    ];
   };
 }
 

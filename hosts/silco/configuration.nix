@@ -6,6 +6,8 @@
     ./containers.nix
   ];
 
+  users.groups.dialout.members = [ "sasan" ];
+
   # Bootloader
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
@@ -39,6 +41,20 @@
   services.xrdp.defaultWindowManager = "xfce4-session";
   services.xrdp.openFirewall = true;
   services.openssh.enable = true;
+
+  # Networking
+  networking.firewall.allowedTCPPorts = [ 8123 8085 8084 5580 ];
+
+  services.avahi = {
+    enable = true;
+    nssmdns4 = true;
+    publish = {
+      enable = true;
+      addresses = true;
+      workstation = true;
+    };
+  };
+
 
   system.stateVersion = "25.11";
 }
