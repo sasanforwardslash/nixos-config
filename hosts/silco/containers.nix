@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   systemd.tmpfiles.rules = [
     "d /var/lib/glance 0755 root root -"
@@ -6,6 +6,13 @@
 		"d /var/lib/homeassistant/config 0755 root root -"
     "d /var/lib/otbr 0755 root root -"
     "d /var/lib/matter 0755 root root -"
+    "d /var/lib/adguard 0755 root root -"
+    "d /var/lib/adguard/work 0755 root root -"
+    "d /var/lib/adguard/conf 0755 root root -"
+    "d /var/lib/caddy 0755 root root -"
+    "d /var/lib/caddy/data 0755 root root -"
+    "d /var/lib/caddy/config 0755 root root -"
+
 	];
 
 	virtualisation.oci-containers = {
@@ -26,6 +33,37 @@
 				  "/var/lib/glance/glance.yaml:/app/config/glance.yml"
 				];
 			};
+
+      adguard = {
+        image = "adguard/adguardhome:latest";
+        autoStart = true;
+        ports = [
+          "53:53/tcp"
+          "53:53/udp"
+          "3000:3000/tcp"
+          "192.168.2.206:8086:8086/tcp"
+        ];
+        volumes = [
+          "/var/lib/adguard/work:/opt/adguardhome/work"
+          "/var/lib/adguard/conf:/opt/adguardhome/conf"
+        ];
+      };
+
+      caddy = {
+        image = "ghcr.io/serfriz/caddy-cloudflare:latest";
+        autoStart = true;
+        ports = [
+          "80:80"
+          "443:443"
+          "443:443/udp"
+        ];
+        volumes = [
+          "/var/lib/caddy/Caddyfile:/etc/caddy/Caddyfile"
+          "/var/lib/caddy/data:/data"
+          "/var/lib/caddy/config:/config"
+        ];
+        environmentFiles = [ config.sops.secrets.cloudflare_api_token.path ];
+      };
 
       otbr = {
         image = "ghcr.io/ownbee/hass-otbr-docker:latest";

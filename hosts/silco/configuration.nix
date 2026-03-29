@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, lib, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -13,6 +13,8 @@
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
   networking.hostName = "silco";
+
+  systemd.defaultUnit = lib.mkForce "multi-user.target";
 
   # Virtualization
   virtualisation.docker.enable = true;
@@ -43,7 +45,8 @@
   services.openssh.enable = true;
 
   # Networking
-  networking.firewall.allowedTCPPorts = [ 8123 8085 8084 5580 ];
+  networking.firewall.allowedTCPPorts = [ 8123 8086 8085 8084 8081 5580 3000 443 80 53 ];
+  networking.firewall.allowedUDPPorts = [ 5353 443 53 ];
 
   services.avahi = {
     enable = true;

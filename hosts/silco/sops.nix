@@ -6,6 +6,7 @@
 
     secrets = {
       placeholder = {};
+      cloudflare_api_token = {};
     };
   };
 }

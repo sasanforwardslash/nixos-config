@@ -5,6 +5,9 @@
   home.stateVersion = "24.11";
 
   programs.home-manager.enable = true;
+  home.sessionVariables = {
+    SOPS_AGE_KEY_FILE = "/home/sasan/.config/sops/age/keys.txt";
+  };
 
   # --- Packages ---
   home.packages = with pkgs; [
@@ -59,7 +62,7 @@
       set number
       set relativenumber
       set tabstop=2
-      set shiftwidth = 2
+      set shiftwidth=2
       set expandtab
       set clipboard=unnamedplus
     '';
