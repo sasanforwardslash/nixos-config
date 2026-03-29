@@ -58,6 +58,61 @@
     };
   };
 
+  # Storage
+  fileSystems."/mnt/primary" = {
+    device = "/dev/disk/by-uuid/2fca864a-bf1a-4557-9663-d47936ee76b7";
+    fsType = "ext4";
+    options = [ "defaults" "nofail" ];
+  };
+
+  fileSystems."/mnt/mirror" = {
+    device = "/dev/disk/by-uuid/080e5efa-b36c-438e-98d2-a1945eb0cd97";
+    fsType = "ext4";
+    options = [ "defaults" "nofail" ];
+  };
+
+  systemd.services.mirror-sync = {
+    description = "Mirror primary drive to mirror drive";
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStart = "${pkgs.rsync}/bin/rsync -av --delete /mnt/primary/ /mnt/mirror/";
+    };
+  };
+
+  systemd.timers.mirror-sync = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnCalendar = "03:00";
+      Persistent = true;
+    };
+  };
+
+  services.samba = {
+    enable = true;
+    openFirewall = true;
+    settings = {
+      global = {
+        "workgroup" = "WORKGROUP";
+        "server string" = "silco";
+        "server role" = "standalone server";
+        "log level" = "1";
+        "min protocol" = "SMB2";
+        "ntlm auth" = "yes";
+      };
+      primary = {
+        "path" = "/mnt/primary";
+        "browseable" = "yes";
+        "writeable" = "yes";
+        "valid users" = "sasan";
+      };
+    };
+  };
+
+  services.samba-wsdd = {
+    enable = true;
+    openFirewall = true;
+    interface = "enp1s0";
+  };
 
   system.stateVersion = "25.11";
 }

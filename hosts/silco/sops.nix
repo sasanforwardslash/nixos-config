@@ -7,6 +7,7 @@
     secrets = {
       placeholder = {};
       cloudflare_api_token = {};
+      netbird_setup_key = {};
     };
   };
 }

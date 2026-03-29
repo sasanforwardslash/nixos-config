@@ -12,6 +12,10 @@
     "d /var/lib/caddy 0755 root root -"
     "d /var/lib/caddy/data 0755 root root -"
     "d /var/lib/caddy/config 0755 root root -"
+    "d /var/lib/netbird 0755 root root -"
+    "d /mnt/primary 0755 root root -"
+    "d /mnt/mirror 0755 root root -"
+    "d /mnt/primary 0755 sasan users -"
 
 	];
 
@@ -32,6 +36,9 @@
 				volumes = [
 				  "/var/lib/glance/glance.yaml:/app/config/glance.yml"
 				];
+        extraOptions = [
+          "--pid=host"
+        ];
 			};
 
       adguard = {
@@ -63,6 +70,22 @@
           "/var/lib/caddy/config:/config"
         ];
         environmentFiles = [ config.sops.secrets.cloudflare_api_token.path ];
+      };
+
+      netbird = {
+        image = "netbirdio/netbird:latest";
+        autoStart = true;
+        extraOptions = [
+          "--network=host"
+          "--cap-add=NET_ADMIN"
+          "--cap-add=SYS_ADMIN"
+          "--cap-add=SYS_RESOURCE"
+          "--device=/dev/net/tun:/dev/net/tun"
+        ];
+        volumes = [
+          "/var/lib/netbird:/etc/netbird"
+        ];
+        environmentFiles = [ config.sops.secrets.netbird_setup_key.path ];
       };
 
       otbr = {
