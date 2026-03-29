@@ -16,6 +16,9 @@
     "d /mnt/primary 0755 root root -"
     "d /mnt/mirror 0755 root root -"
     "d /mnt/primary 0755 sasan users -"
+    "d /mnt/primary/nextcloud 0755 sasan users -"
+    "d /mnt/primary/nextcloud/data 0755 sasan users -"
+    "d /mnt/primary/nextcloud/db 0755 sasan users -"
 
 	];
 
@@ -137,6 +140,45 @@
   				"--device=/dev/serial/by-id/usb-Itead_Sonoff_Zigbee_3.0_USB_Dongle_Plus_V2_3c0ae4955f4eef1193bc45b3174bec31-if00-port0:/dev/ttyUSB1"
 				];
 			};
+
+      nextcloud-db = {
+        image = "postgres:16-alpine";
+        autoStart = true;
+        ports = [ "5432:5432" ];
+        environmentFiles = [ config.sops.secrets.nextcloud_db_password.path ];
+        volumes = [
+          "/mnt/primary/nextcloud/db:/var/lib/postgresql/data"
+        ];
+        environment = {
+          POSTGRES_DB = "nextcloud";
+          POSTGRES_USER = "nextcloud";
+          POSTGRES_HOST_AUTH_METHOD = "md5";
+        };
+      };
+
+      nextcloud = {
+        image = "nextcloud:stable";
+        autoStart = true;
+        ports = [ "8083:80" ];
+        dependsOn = [ "nextcloud-db" ];
+        environmentFiles = [
+          config.sops.secrets.nextcloud_admin_password.path
+          config.sops.secrets.nextcloud_db_password.path
+        ];
+        volumes = [
+          "/mnt/primary/nextcloud/data:/var/www/html"
+        ];
+        environment = {
+          POSTGRES_HOST = "192.168.2.206";
+          POSTGRES_DB = "nextcloud";
+          POSTGRES_USER = "nextcloud";
+          NEXTCLOUD_ADMIN_USER = "sasan";
+          NEXTCLOUD_TRUSTED_DOMAINS = "nextcloud.mothworks.me";
+          NEXTCLOUD_TRUSTED_PROXIES = "192.168.2.206";
+          OVERWRITEPROTOCOL = "https";
+          OVERWRITECLIURL = "https://nextcloud.mothworks.me";
+        };
+      };
 
 		};
 	};
