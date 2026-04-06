@@ -16,28 +16,24 @@
     "d /mnt/primary 0755 root root -"
     "d /mnt/mirror 0755 root root -"
     "d /mnt/primary 0755 sasan users -"
-    "d /mnt/primary/nextcloud 0755 sasan users -"
-    "d /mnt/primary/nextcloud/data 0755 sasan users -"
-    "d /mnt/primary/nextcloud/db 0755 sasan users -"
-
+    "d /var/lib/filebrowser 0755 sasan users -"
+    "d /var/lib/syncthing 0755 sasan users -"
+    "d /mnt/primary/git/db 0755 sasan users -"
+    "d /mnt/primary/git/data 0755 sasan users -"
+    "d /var/lib/gitea 0755 sasan users -"
 	];
 
 	virtualisation.oci-containers = {
     backend = "docker";
 		containers = {
 
-		  hello = {
-        image = "nginx:alpine";
-				ports = [ "8080:80" ];
-        autoStart = true;
-			};
-
-			glance = {
+ 			glance = {
         image = "glanceapp/glance:latest";
 				ports = [ "8081:8080" ];
 				autoStart = true;
 				volumes = [
 				  "/var/lib/glance/glance.yaml:/app/config/glance.yml"
+          "/var/run/docker.sock:/var/run/docker.sock"
 				];
         extraOptions = [
           "--pid=host"
@@ -141,45 +137,68 @@
 				];
 			};
 
-      nextcloud-db = {
+      filebrowser = {
+        image = "filebrowser/filebrowser:latest";
+        autoStart = true;
+        ports = [ "8083:80" ];
+        volumes = [
+          "/mnt/primary/files:/srv"
+          "/var/lib/filebrowser:/database"
+        ];
+        extraOptions = [
+          "--user=1000:100"
+        ];
+        environment = {
+          FB_DATABASE = "/database/filebrowser.db";
+          FB_ROOT = "/srv";
+          FB_LOG = "stdout";
+          FB_NOAUTH = "false";
+        };
+      };
+
+      gitea-db = {
         image = "postgres:16-alpine";
         autoStart = true;
         ports = [ "5432:5432" ];
-        environmentFiles = [ config.sops.secrets.nextcloud_db_password.path ];
+        environmentFiles = [ config.sops.secrets.gitea_db_password.path ];
         volumes = [
-          "/mnt/primary/nextcloud/db:/var/lib/postgresql/data"
+          "/mnt/primary/git/db:/var/lib/postgresql/data"
         ];
         environment = {
-          POSTGRES_DB = "nextcloud";
-          POSTGRES_USER = "nextcloud";
-          POSTGRES_HOST_AUTH_METHOD = "md5";
+          POSTGRES_DB = "gitea";
+          POSTGRES_USER = "gitea";
         };
       };
 
-      nextcloud = {
-        image = "nextcloud:stable";
+      gitea = {
+        image = "gitea/gitea:latest";
         autoStart = true;
-        ports = [ "8083:80" ];
-        dependsOn = [ "nextcloud-db" ];
-        environmentFiles = [
-          config.sops.secrets.nextcloud_admin_password.path
-          config.sops.secrets.nextcloud_db_password.path
+        ports = [ "8087:3000" ];
+        dependsOn = [ "gitea-db" ];
+        volumes = [
+          "/mnt/primary/git/data:/data"
+          "/var/lib/gitea/app.ini:/data/gitea/conf/app.ini"
+          "/etc/timezone:/etc/timezone:ro"
+          "/etc/localtime:/etc/localtime:ro"
+        ];
+      };
+
+      syncthing = {
+        image = "syncthing/syncthing:latest";
+        autoStart = true;
+        extraOptions = [
+          "--network=host"
         ];
         volumes = [
-          "/mnt/primary/nextcloud/data:/var/www/html"
+          "/var/lib/syncthing:/var/syncthing"
+          "/mnt/primary:/mnt/primary"
         ];
         environment = {
-          POSTGRES_HOST = "192.168.2.206";
-          POSTGRES_DB = "nextcloud";
-          POSTGRES_USER = "nextcloud";
-          NEXTCLOUD_ADMIN_USER = "sasan";
-          NEXTCLOUD_TRUSTED_DOMAINS = "nextcloud.mothworks.me";
-          NEXTCLOUD_TRUSTED_PROXIES = "192.168.2.206";
-          OVERWRITEPROTOCOL = "https";
-          OVERWRITECLIURL = "https://nextcloud.mothworks.me";
+          PUID = "1000";
+          PGID = "100";
         };
       };
 
-		};
+ 		};
 	};
 }

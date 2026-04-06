@@ -8,8 +8,7 @@
       placeholder = {};
       cloudflare_api_token = {};
       netbird_setup_key = {};
-      nextcloud_admin_password = {};
-      nextcloud_db_password = {};
+      gitea_db_password = {};
     };
   };
 }

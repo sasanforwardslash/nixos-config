@@ -45,8 +45,8 @@
   services.openssh.enable = true;
 
   # Networking
-  networking.firewall.allowedTCPPorts = [ 8123 8086 8085 8084 8083 8081 5580 5432 3000 443 80 53 ];
-  networking.firewall.allowedUDPPorts = [ 5353 443 53 ];
+  networking.firewall.allowedTCPPorts = [ 22000 8384 8123 8087 8086 8085 8084 8083 8081 5580 5432 3000 443 80 53 ];
+  networking.firewall.allowedUDPPorts = [ 22000 21027 5353 443 53 ];
 
   services.avahi = {
     enable = true;
