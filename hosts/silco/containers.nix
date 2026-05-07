@@ -21,6 +21,12 @@
     "d /mnt/primary/git/db 0755 sasan users -"
     "d /mnt/primary/git/data 0755 sasan users -"
     "d /var/lib/gitea 0755 sasan users -"
+    "d /var/lib/calibre-web 0755 sasan users -"
+    "d /var/lib/kosync 0755 sasan users -"
+    "d /var/lib/kosync/logs 0755 sasan users -"
+    "d /var/lib/kosync/logs/app 0755 sasan users -"
+    "d /var/lib/kosync/logs/redis 0755 sasan users -"
+    "d /var/lib/kosync/data 0755 sasan users -"
 	];
 
 	virtualisation.oci-containers = {
@@ -180,6 +186,32 @@
           "/var/lib/gitea/app.ini:/data/gitea/conf/app.ini"
           "/etc/timezone:/etc/timezone:ro"
           "/etc/localtime:/etc/localtime:ro"
+        ];
+      };
+
+      calibre-web = {
+        image = "lscr.io/linuxserver/calibre-web:latest";
+        autoStart = true;
+        ports = [ "8089:8083" ];
+        volumes = [
+          "/var/lib/calibre-web:/config"
+          "/mnt/primary/books:/books"
+        ];
+        environment = {
+          PUID = "1000";
+          PGID = "100";
+          TZ = "Europe/Berlin";
+        };
+      };
+
+      kosync = {
+        image = "koreader/kosync:latest";
+        autoStart = true;
+        ports = [ "8090:7200" ];
+        volumes = [
+          "/var/lib/kosync/logs/app:/app/koreader-sync-server/logs"
+          "/var/lib/kosync/logs/redis:/var/log/redis"
+          "/var/lib/kosync/data:/var/lib/redis"
         ];
       };
 

@@ -27,7 +27,6 @@
     layout = "us";
     variant = "";
   };
-  services.printing.enable = true;
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -37,6 +36,30 @@
   };
   programs.firefox.enable = true;
 
+  # Printing
+  services.printing = {
+    enable = true;
+    drivers = [ pkgs.cnijfilter2 ];
+    listenAddresses = [ "*:631" ];
+    allowFrom = [ "localhost" ];
+    browsing = true;
+    defaultShared = true;
+    extraConf = ''
+      ServerAlias *
+      WebInterface Yes
+      DefaultEncryption Never
+
+      <Location />
+        Order allow,deny
+        Allow from localhost
+
+      <Location /admin>
+        Order allow,deny
+        Allow from localhost
+      </Location>
+    '';
+  };
+
   # Remote access
   services.x2goserver.enable = true;
   services.xrdp.enable = true;
@@ -45,8 +68,8 @@
   services.openssh.enable = true;
 
   # Networking
-  networking.firewall.allowedTCPPorts = [ 22000 8384 8123 8087 8086 8085 8084 8083 8081 5580 5432 3000 443 80 53 ];
-  networking.firewall.allowedUDPPorts = [ 22000 21027 5353 443 53 ];
+  networking.firewall.allowedTCPPorts = [ 22000 8384 8123 8090 8089 8087 8086 8085 8084 8083 8081 5580 5432 3000 631 443 80 53 ];
+  networking.firewall.allowedUDPPorts = [ 22000 21027 5353 631 443 53 ];
 
   services.avahi = {
     enable = true;
